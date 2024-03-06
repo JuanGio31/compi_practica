@@ -1,0 +1,23 @@
+package org.example;
+
+import java_cup.runtime.*;
+
+class Parser;
+
+//** Simboloes terminal **//
+terminal PLUS, TIMES, LPAREN, RPAREN;
+terminal Integer NUMBER;
+
+//** Simbolos no terminales **//
+
+non terminal Integer expr;
+
+//** Definir gramaticas **//
+
+precedence left PLUS;
+precedence left TIMES;
+
+expr ::= expr: e1 PLUS expr: e2 {:RESULT = e1+e2; :}
+      |  expr: e1 TIMES expr: e2    {:RESULT = e1*e2; :}
+      |  LPAREN expr: e RPAREN  {:RESULT = e; :}
+      |  NUMBER:n  {:RESULT = n; :};
