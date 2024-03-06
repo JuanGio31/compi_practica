@@ -4,12 +4,19 @@
  */
 package org.example.vista;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.StringReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.example.modelo.utilidades.FilesControl;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import org.example.Escaner;
+import org.example.Parser;
 import org.example.modelo.proyecto.Proyecto;
 
 /**
@@ -31,6 +38,28 @@ public class Visor extends javax.swing.JFrame {
         setTitle("SQL-EMULE");
 
         filesControl = new FilesControl();
+        jTextArea1.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    StringReader tmp = new StringReader(jTextArea1.getText());
+                    Parser pa = new Parser(new Escaner(tmp));
+                    try {
+                        pa.parse();
+                    } catch (Exception ex) {
+                        System.out.println("Error > " + ex.getMessage());
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -46,7 +75,7 @@ public class Visor extends javax.swing.JFrame {
         pestanias = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        visorCSV = new javax.swing.JTextArea();
         paneGen1 = new org.example.vista.PaneGen();
         jScrollPane1 = new javax.swing.JScrollPane();
         jdirectorio = new javax.swing.JTree();
@@ -56,6 +85,8 @@ public class Visor extends javax.swing.JFrame {
         btnAcept = new javax.swing.JButton();
         zonaTrabajo = new javax.swing.JTabbedPane();
         area_consultas = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
         area_errores = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
@@ -67,9 +98,9 @@ public class Visor extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane2.setViewportView(jTextArea1);
+        visorCSV.setColumns(20);
+        visorCSV.setRows(5);
+        jScrollPane2.setViewportView(visorCSV);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -158,15 +189,25 @@ public class Visor extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane3.setViewportView(jTextArea1);
+
         javax.swing.GroupLayout area_consultasLayout = new javax.swing.GroupLayout(area_consultas);
         area_consultas.setLayout(area_consultasLayout);
         area_consultasLayout.setHorizontalGroup(
             area_consultasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 848, Short.MAX_VALUE)
+            .addGroup(area_consultasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 836, Short.MAX_VALUE)
+                .addContainerGap())
         );
         area_consultasLayout.setVerticalGroup(
             area_consultasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 171, Short.MAX_VALUE)
+            .addGroup(area_consultasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         zonaTrabajo.addTab("Consultas", area_consultas);
@@ -276,8 +317,9 @@ public class Visor extends javax.swing.JFrame {
 
     private void btnAceptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptActionPerformed
         if (nodoSeleccionado != null) {
+            visorCSV.setText(" ");
             String txt = filesControl.getContenido(obtenerRuta());
-            jTextArea1.setText(txt);
+            visorCSV.setText(txt);
         } else {
             JOptionPane.showMessageDialog(null, "No hay ningun elemento seleccionado", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -341,10 +383,12 @@ public class Visor extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTree jdirectorio;
     private org.example.vista.PaneGen paneGen1;
     private javax.swing.JTabbedPane pestanias;
+    private javax.swing.JTextArea visorCSV;
     private javax.swing.JTabbedPane zonaTrabajo;
     // End of variables declaration//GEN-END:variables
 }

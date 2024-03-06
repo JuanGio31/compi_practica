@@ -4,20 +4,65 @@ import java_cup.runtime.*;
 
 class Parser;
 
+parser code {:
+    public void syntax_error (Symbol sy) {
+        System.out.println("Sintax error: "+ sy.value);
+    }
+
+    public void unrecovered_syntax_error(Symbol s)throws java.lang.Exception{
+        System.out.println("Sintax error:" + s.value);
+    }
+:};
+
+
 //** Simboloes terminal **//
-terminal PLUS, TIMES, LPAREN, RPAREN;
-terminal Integer NUMBER;
+terminal SELECCIONAR, FILTRAR, INSERTAR, ACTUALIZAR, ASIGNAR, ELIMINAR, VALORES, EN, FIN_INST, COMA;
+terminal OP_RELACIONAL, AND, OR, COLUMN_ID, CONST, LPAREN, RPAREN, PLUS, TIMES, PATH, NUMBER;
 
 //** Simbolos no terminales **//
 
-non terminal Integer expr;
+//non terminal Double expr;
+nonterminal archivos, filtrar, logica, relacional, listar, expr, valores;
+nonterminal seleccionar, insertar, actualizar, eliminar;
 
 //** Definir gramaticas **//
 
-precedence left PLUS;
-precedence left TIMES;
+//precedence left PLUS;
+//precedence left TIMES;
 
-expr ::= expr: e1 PLUS expr: e2 {:RESULT = e1+e2; :}
-      |  expr: e1 TIMES expr: e2    {:RESULT = e1*e2; :}
-      |  LPAREN expr: e RPAREN  {:RESULT = e; :}
-      |  NUMBER:n  {:RESULT = n; :};
+start with seleccionar;
+
+//expr ::= expr: e1 PLUS expr: e2 {:RESULT = e1+e2; :}
+//      |  expr: e1 TIMES expr: e2    {:RESULT = e1*e2; :}
+//      |  LPAREN expr: e RPAREN  {:RESULT = e; :}
+//      |  NUMBER:n  {:RESULT = n; :};
+
+archivos::= COLUMN_ID
+            | COLUMN_ID COMA archivos
+            | LPAREN COLUMN_ID COMA archivos RPAREN;
+
+relacional::= COLUMN_ID OP_RELACIONAL CONST
+            |   COLUMN_ID OP_RELACIONAL NUMBER;
+
+logica::= relacional
+        |   relacional AND relacional
+        |   relacional OR relacional;
+
+filtrar::= FILTRAR logica;
+
+expr::= COLUMN_ID
+        | COLUMN_ID COMA expr;
+
+listar::= LPAREN COLUMN_ID COMA expr RPAREN;
+
+seleccionar::= SELECCIONAR archivos EN PATH FIN_INST
+            |   SELECCIONAR archivos EN PATH filtrar FIN_INST;
+
+valores::= CONST
+        |   NUMBER
+        |   COMA valores ;
+
+insertar::= INSERTAR EN PATH listar VALORES LPAREN valores RPAREN FIN_INST;
+
+actualizar::= ACTUALIZAR EN PATH ASIGNAR archivos filtrar FIN_INST;
+
